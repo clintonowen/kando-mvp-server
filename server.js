@@ -7,6 +7,8 @@ const mongoose = require('mongoose');
 
 const { PORT, CLIENT_ORIGIN, DATABASE_URL } = require('./config');
 
+const tasksRouter = require('./routes/tasks');
+
 // Create an Express application
 const app = express();
 
@@ -24,6 +26,9 @@ app.use(
 
 // Parse request body
 app.use(express.json());
+
+// Mount routers
+app.use('/api/tasks', tasksRouter);
 
 // Custom 404 Not Found route handler
 app.use((req, res, next) => {
