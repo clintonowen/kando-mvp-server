@@ -5,8 +5,11 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js",
+    "mocha": "mocha --exit --file test/server.test.js",
     "test": "cross-env NODE_ENV=test mocha --file test/server.test.js",
-    "cover": "nyc --reporter=lcov --reporter=text-summary npm test"
+    "cover": "nyc --reporter=lcov --reporter=text-summary npm test",
+    "heroku": "node server.js",
+    "travis": "npm run mocha"
   },
   "author": "Clinton Owen <clint@clintonowen.com>",
   "license": "GNU GPLv3",
