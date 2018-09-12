@@ -1,4 +1,5 @@
 // node ./utils/seed-database.js
+// DATABASE_URL=mLab_URI node ./utils/seed-database.js
 
 'use strict';
 
