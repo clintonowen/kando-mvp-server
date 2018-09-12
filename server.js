@@ -18,11 +18,10 @@ app.use(
   })
 );
 
-app.use(
-  cors({
-    origin: CLIENT_ORIGIN
-  })
-);
+// Allow requests from client domain/origin
+app.use(cors({
+  origin: CLIENT_ORIGIN
+}));
 
 // Parse request body
 app.use(express.json());
