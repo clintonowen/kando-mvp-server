@@ -26,7 +26,6 @@ router.get('/', (req, res, next) => {
 
 /* ========== PUT/UPDATE TASK ========== */
 router.put('/:id', (req, res, next) => {
-  return res.json("Hello world");
   const { id } = req.params;
   // const userId = req.user.id;
 
