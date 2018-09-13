@@ -6,7 +6,7 @@ const schema = new mongoose.Schema({
   name: { type: String, required: true },
   description: String,
   time: { type: Number, default: 0 },
-  columnId: { type: mongoose.Schema.Types.ObjectId, ref: 'Column' },
+  columnId: { type: mongoose.Schema.Types.ObjectId, ref: 'Column', required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 });
 

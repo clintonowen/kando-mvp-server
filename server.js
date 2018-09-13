@@ -4,11 +4,16 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const passport = require('passport');
 
 const { PORT, CLIENT_ORIGIN, DATABASE_URL } = require('./config');
+const localStrategy = require('./passport/local');
+const jwtStrategy = require('./passport/jwt');
 
 const columnsRouter = require('./routes/columns');
 const tasksRouter = require('./routes/tasks');
+const usersRouter = require('./routes/users');
+const authRouter = require('./routes/auth');
 
 // Create an Express application
 const app = express();
@@ -27,9 +32,18 @@ app.use(cors({
 // Parse request body
 app.use(express.json());
 
+// Utilize the given `strategy`
+passport.use(localStrategy);
+passport.use(jwtStrategy);
+
+// Protect endpoints using JWT Strategy
+const jwtAuth = passport.authenticate('jwt', { session: false, failWithError: true });
+
 // Mount routers
-app.use('/api/columns', columnsRouter);
-app.use('/api/tasks', tasksRouter);
+app.use('/api/columns', jwtAuth, columnsRouter);
+app.use('/api/tasks', jwtAuth, tasksRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/auth', authRouter);
 
 // Custom 404 Not Found route handler
 app.use((req, res, next) => {

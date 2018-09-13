@@ -4,14 +4,14 @@ const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 
 // ===== Define UserSchema & UserModel =====
-const schema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   email: { type: String, required: true },
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true }
 });
 
 // Transform output during `res.json(data)`, `console.log(data)` etc.
-schema.set('toObject', {
+UserSchema.set('toObject', {
   virtuals: true,
   transform: (doc, result) => {
     delete result._id;
@@ -21,13 +21,13 @@ schema.set('toObject', {
 });
 
 // Note: Use `function` (not an `arrow function`) to allow setting `this`
-schema.methods.validatePassword = function (pwd) {
+UserSchema.methods.validatePassword = function (pwd) {
   const currentUser = this;
   return bcrypt.compare(pwd, currentUser.password);
 };
 
-schema.statics.hashPassword = function (pwd) {
+UserSchema.statics.hashPassword = function (pwd) {
   return bcrypt.hash(pwd, 10);
 };
 
-module.exports = mongoose.model('User', schema);
+module.exports = mongoose.model('User', UserSchema);

@@ -3,12 +3,12 @@
     "_id": "000000000000000000000001",
     "email": "clint@clintonowen.com",
     "username": "clint",
-    "password": "$2a$10$gnrFHYtwqqUbbb5/.vcUq.ikyAK3Tx0ZT/RaqDG0GCITWdnKii.ua"
+    "password": "$2a$10$tQWMf/fUiQ4XJyw3sYkwBuoZV90rOusslrkuiOi1oXQ0z8nZUFAmi"
   },
   {
     "_id": "000000000000000000000002",
     "email": "test@user.com",
     "username": "testuser",
-    "password": "$2a$10$gnrFHYtwqqUbbb5/.vcUq.ikyAK3Tx0ZT/RaqDG0GCITWdnKii.ua"
+    "password": "$2a$10$tQWMf/fUiQ4XJyw3sYkwBuoZV90rOusslrkuiOi1oXQ0z8nZUFAmi"
   }
 ]
