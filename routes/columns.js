@@ -9,11 +9,11 @@ const router = express.Router();
 
 /* ========== GET/READ ALL COLUMNS ========== */
 router.get('/', (req, res, next) => {
-  // const userId = req.user.id;
+  const userId = req.user.id;
 
-  // let filter = { userId };
+  let filter = { userId };
 
-  Column.find()
+  Column.find(filter)
     // .sort({ id: 'desc' })
     .then(results => {
       res.json(results);

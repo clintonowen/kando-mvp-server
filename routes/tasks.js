@@ -33,11 +33,11 @@ function validateColumnId(columnId, userId) {
 
 /* ========== GET/READ ALL TASKS ========== */
 router.get('/', (req, res, next) => {
-  // const userId = req.user.id;
+  const userId = req.user.id;
 
-  // let filter = { userId };
+  let filter = { userId };
 
-  Task.find()
+  Task.find(filter)
     // .sort({ id: 'desc' })
     .then(results => {
       res.json(results);
