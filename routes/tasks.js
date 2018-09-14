@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 
 const Task = require('../models/task');
 const Column = require('../models/column');
+const User = require('../models/user');
 
 const router = express.Router();
 
@@ -31,14 +32,14 @@ function validateTaskId(taskId, userId) {
     });
 }
 
-function validateColumnId(columnId, userId) {
-  if (columnId === undefined) {
+function validateColumnId(columnId, userId, required) {
+  if (columnId === undefined && required) {
     const err = new Error('Missing `columnId`');
     err.status = 400;
     return Promise.reject(err);
   }
 
-  if (!mongoose.Types.ObjectId.isValid(columnId)) {
+  if (columnId && !mongoose.Types.ObjectId.isValid(columnId)) {
     const err = new Error('The `columnId` is not valid');
     err.status = 400;
     return Promise.reject(err);
@@ -46,8 +47,31 @@ function validateColumnId(columnId, userId) {
 
   return Column.count({ _id: columnId, userId })
     .then(count => {
-      if (count === 0) {
+      if (required && count === 0) {
         const err = new Error('The `columnId` is not valid');
+        err.status = 400;
+        return Promise.reject(err);
+      }
+    });
+}
+
+function validateUserId(userId) {
+  if (userId === undefined) {
+    const err = new Error('Missing `userId`');
+    err.status = 400;
+    return Promise.reject(err);
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    const err = new Error('The `userId` is not valid');
+    err.status = 400;
+    return Promise.reject(err);
+  }
+
+  return User.count({ _id: userId })
+    .then(count => {
+      if (count === 0) {
+        const err = new Error('The `userId` is not valid');
         err.status = 400;
         return Promise.reject(err);
       }
@@ -60,7 +84,8 @@ router.get('/', (req, res, next) => {
 
   let filter = { userId };
 
-  Task.find(filter)
+  validateUserId(userId)
+    .then(() => Task.find(filter))
     // .sort({ id: 'desc' })
     .then(results => {
       res.json(results);
@@ -81,7 +106,8 @@ router.get('/:id', (req, res, next) => {
     return next(err);
   }
 
-  Task.findOne({ _id: id, userId })
+  validateUserId(userId)
+    .then(() => Task.findOne({ _id: id, userId }))
     .then(result => {
       if (result) {
         res.json(result);
@@ -113,8 +139,11 @@ router.post('/', (req, res, next) => {
   }
 
   const newTask = { name, columnId, description, userId };
-
-  validateColumnId(columnId, userId)
+  
+  Promise.all([
+    validateUserId(userId),
+    validateColumnId(columnId, userId, true)
+  ])
     .then(() => Task.create(newTask))
     .then(result => {
       res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
@@ -145,7 +174,8 @@ router.put('/:id', (req, res, next) => {
   }
 
   Promise.all([
-    validateColumnId(toUpdate.columnId, userId),
+    validateUserId(userId),
+    validateColumnId(toUpdate.columnId, userId, false),
     validateTaskId(id, userId)
   ])
     .then(() => Task.findByIdAndUpdate(id, toUpdate, { new: true }))
@@ -173,7 +203,8 @@ router.delete('/:id', (req, res, next) => {
     return next(err);
   }
 
-  Task.findOneAndRemove({ _id: id, userId })
+  validateUserId(userId)
+    .then(() => Task.findOneAndRemove({ _id: id, userId }))
     .then(() => {
       res.sendStatus(204);
     })
