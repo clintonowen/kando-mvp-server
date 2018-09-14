@@ -8,6 +8,29 @@ const Column = require('../models/column');
 
 const router = express.Router();
 
+function validateTaskId(taskId, userId) {
+  if (taskId === undefined) {
+    const err = new Error('Missing `taskId`');
+    err.status = 400;
+    return Promise.reject(err);
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(taskId)) {
+    const err = new Error('The `taskId` is not valid');
+    err.status = 400;
+    return Promise.reject(err);
+  }
+
+  return Task.count({ _id: taskId, userId })
+    .then(count => {
+      if (count === 0) {
+        const err = new Error('The `taskId` is not valid');
+        err.status = 400;
+        return Promise.reject(err);
+      }
+    });
+}
+
 function validateColumnId(columnId, userId) {
   if (columnId === undefined) {
     const err = new Error('Missing `columnId`');
@@ -41,6 +64,30 @@ router.get('/', (req, res, next) => {
     // .sort({ id: 'desc' })
     .then(results => {
       res.json(results);
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
+/* ========== GET/READ A SINGLE TASK ========== */
+router.get('/:id', (req, res, next) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error('The `id` is not valid');
+    err.status = 400;
+    return next(err);
+  }
+
+  Task.findOne({ _id: id, userId })
+    .then(result => {
+      if (result) {
+        res.json(result);
+      } else {
+        next();
+      }
     })
     .catch(err => {
       next(err);
@@ -97,13 +144,38 @@ router.put('/:id', (req, res, next) => {
     return next(err);
   }
 
-  Task.findByIdAndUpdate(id, toUpdate, { new: true })
+  Promise.all([
+    validateColumnId(toUpdate.columnId, userId),
+    validateTaskId(id, userId)
+  ])
+    .then(() => Task.findByIdAndUpdate(id, toUpdate, { new: true }))
     .then(result => {
       if (result) {
         res.json(result);
       } else {
         next();
       }
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
+/* ========== DELETE/REMOVE A SINGLE TASK ========== */
+router.delete('/:id', (req, res, next) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+
+  /***** Never trust users - validate input *****/
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error('The `id` is not valid');
+    err.status = 400;
+    return next(err);
+  }
+
+  Task.findOneAndRemove({ _id: id, userId })
+    .then(() => {
+      res.sendStatus(204);
     })
     .catch(err => {
       next(err);
