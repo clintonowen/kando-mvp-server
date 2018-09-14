@@ -3,6 +3,7 @@
 const express = require('express');
 
 const User = require('../models/user');
+const Column = require('../models/column');
 
 const router = express.Router();
 
@@ -91,8 +92,21 @@ router.post('/', (req, res, next) => {
       };
       return User.create(newUser);
     })
+    .then(user => {
+      const defaultColumns = [
+        {name: 'To Do', userId: user.id},
+        {name: 'Do Today', userId: user.id},
+        {name: 'In Progress', userId: user.id},
+        {name: 'Done', userId: user.id}
+      ];
+      return Promise.all([
+        Promise.resolve(user),
+        Column.insertMany(defaultColumns)
+      ]);
+    })
     .then(result => {
-      return res.status(201).location(`/api/users/${result.id}`).json(result);
+      const user = result[0];
+      return res.status(201).location(`/api/users/${user.id}`).json(user);
     })
     .catch(err => {
       if (err.code === 11000) {
