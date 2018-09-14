@@ -69,9 +69,18 @@ router.post('/', (req, res, next) => {
     return next(err);
   }
 
+  
   // Username and password were validated as pre-trimmed
   let { username, password, email } = req.body;
   email = email.trim();
+  
+  const emailRegExp = new RegExp(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+  
+  if (!emailRegExp.test(email)) {
+    const err = new Error('Invalid email address');
+    err.status = 422;
+    return next(err);
+  }
 
   return User.hashPassword(password)
     .then(digest => {
