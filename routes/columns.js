@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const Column = require('../models/column');
+const Task = require('../models/task');
 const User = require('../models/user');
 
 const router = express.Router();
@@ -61,7 +62,10 @@ router.get('/', (req, res, next) => {
   let filter = { userId };
 
   validateUserId(userId)
-    .then(() => Column.find(filter))
+    .then(() => Column
+      .find(filter)
+      .populate('tasks')
+    )
     // .sort({ id: 'desc' })
     .then(results => {
       res.json(results);
@@ -126,7 +130,7 @@ router.put('/:id', (req, res, next) => {
   const userId = req.user.id;
 
   const toUpdate = {};
-  const updateableFields = ['name'];
+  const updateableFields = ['name', 'tasks'];
 
   updateableFields.forEach(field => {
     if (field in req.body) {
