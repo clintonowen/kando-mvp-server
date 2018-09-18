@@ -14,8 +14,15 @@ router.post('/', (req, res, next) => {
   const missingField = requiredFields.find(field => !(field in req.body));
 
   if (missingField) {
-    const err = new Error(`Missing '${missingField}' in request body`);
+    let err;
+    if (missingField === 'email') {
+      err = new Error('Please provide an email');
+    } else {
+      err = new Error(`Please provide a '${missingField}'`);
+    }
     err.status = 422;
+    err.reason = 'ValidationError';
+    err.location = missingField;
     return next(err);
   }
 
@@ -25,8 +32,10 @@ router.post('/', (req, res, next) => {
   );
 
   if (nonStringField) {
-    const err = new Error(`Field: '${nonStringField}' must be type String`);
+    const err = new Error(`${nonStringField.charAt(0).toUpperCase()}${nonStringField.slice(1)} must be type: String`);
     err.status = 422;
+    err.reason = 'ValidationError';
+    err.location = nonStringField;
     return next(err);
   }
 
@@ -36,8 +45,10 @@ router.post('/', (req, res, next) => {
   );
 
   if (nonTrimmedField) {
-    const err = new Error(`Field: '${nonTrimmedField}' cannot start or end with whitespace`);
+    const err = new Error('Cannot start or end with whitespace');
     err.status = 422;
+    err.reason = 'ValidationError';
+    err.location = nonTrimmedField;
     return next(err);
   }
 
@@ -51,35 +62,43 @@ router.post('/', (req, res, next) => {
       req.body[field].trim().length < sizedFields[field].min
   );
 
-  if (tooSmallField) {
-    const min = sizedFields[tooSmallField].min;
-    const err = new Error(`Field: '${tooSmallField}' must be at least ${min} characters long`);
-    err.status = 422;
-    return next(err);
-  }
-
   const tooLargeField = Object.keys(sizedFields).find(
     field => 'max' in sizedFields[field] &&
       req.body[field].trim().length > sizedFields[field].max
   );
 
-  if (tooLargeField) {
-    const max = sizedFields[tooLargeField].max;
-    const err = new Error(`Field: '${tooLargeField}' must be at most ${max} characters long`);
+  if (tooSmallField || tooLargeField) {
+    const field = tooSmallField || tooLargeField;
+    const min = sizedFields[field].min;
+    const max = sizedFields[field].max;
+    const err = new Error(`Use between ${min} and ${max} characters for your ${field}`);
     err.status = 422;
+    err.reason = 'ValidationError';
+    err.location = field;
     return next(err);
   }
-
   
   // Username and password were validated as pre-trimmed
   let { username, password, email } = req.body;
   email = email.trim();
+
+  const usernameRegExp = new RegExp(/^[a-zA-Z0-9_]+$/);
+
+  if (!usernameRegExp.test(username)) {
+    const err = new Error('Sorry, only letters (a-z), numbers (0-9), and underscores ( _ ) are allowed');
+    err.status = 422;
+    err.reason = 'ValidationError';
+    err.location = 'username';
+    return next(err);
+  }
   
   const emailRegExp = new RegExp(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
   
   if (!emailRegExp.test(email)) {
-    const err = new Error('Invalid email address');
+    const err = new Error('Please enter a valid email address');
     err.status = 422;
+    err.reason = 'ValidationError';
+    err.location = 'email';
     return next(err);
   }
 
@@ -111,7 +130,9 @@ router.post('/', (req, res, next) => {
     .catch(err => {
       if (err.code === 11000) {
         err = new Error('The username already exists');
-        err.status = 400;
+        err.status = 422;
+        err.reason = 'ValidationError';
+        err.location = 'username';
       }
       next(err);
     });
