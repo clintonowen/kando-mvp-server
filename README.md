@@ -1,42 +1,58 @@
-# KanDo
-<!-- > Short blurb about what your product does. -->
+# KanDo - Server
 
-<!-- [![NPM Version][npm-image]][npm-url]
+<!-- [![NPM Version][npm-image]][npm-url] -->
 [![Build Status][travis-image]][travis-url]
-[![Downloads Stats][npm-downloads]][npm-url] -->
+<!-- [![Downloads Stats][npm-downloads]][npm-url] -->
 
-<!-- One to two paragraph statement about your product and what it does. -->
+## [Live App](https://kando-mvp.herokuapp.com)
 
-<!-- ![](header.png) -->
+## More Information
+### See: [Client GitHub Repo](https://github.com/clintonowen/kando-mvp-client)
 
-<!-- ## Installation
+## Main Project Structure
 
-OS X & Linux:
-
-```sh
-npm install my-crazy-module --save
+```
+kando-mvp-server/
+├── models/ (Mongoose)
+├── node_modules/ (see "Development Setup")
+├── passport/ (Auth strategies)
+├── routes/ (Express Routers)
+├── test/
+├── config.js
+├── LICENSE (GNU GPLv3)
+├── package.json (NPM dependencies)
+├── README.md
+└── server.js (Express App)
 ```
 
-Windows:
+## Development setup
+
+To clone the repo to your local development environment and verify that the test-suite passes, execute the following commands (requires [Node](https://nodejs.org)).
 
 ```sh
-edit autoexec.bat
-``` -->
+# Clone the repo
+git clone https://github.com/clintonowen/kando-mvp-server.git
 
-<!-- ## Usage example
+# Move into the project directory
+cd kando-mvp-server
 
-A few motivating and useful examples of how your product can be used. Spice this up with code blocks and potentially more screenshots.
+# Install dependencies (in /node_modules/)
+npm i
 
-_For more examples and usage, please refer to the [Wiki][wiki]._ -->
-
-<!-- ## Development setup
-
-Describe how to install all development dependencies and how to run an automated test-suite of some kind. Potentially do this for multiple platforms.
-
-```sh
-make install
+# Run the test-suite:
 npm test
-``` -->
+
+# Run the app:
+npm start
+```
+
+## Contributing
+
+1. Fork it (<https://github.com/yourname/yourproject/fork>)
+2. Create your feature branch (`git checkout -b feature/fooBar`)
+3. Commit your changes (`git commit -am 'Add some fooBar'`)
+4. Push to the branch (`git push origin feature/fooBar`)
+5. Create a new Pull Request
 
 <!-- ## Release History
 
@@ -53,21 +69,13 @@ npm test
 * 0.0.1
     * Work in progress -->
 
-<!-- ## Meta
+## Meta
 
-Your Name – [@YourTwitter](https://twitter.com/dbader_org) – YourEmail@example.com
+by Clinton Owen – [@CoderClint](https://twitter.com/CoderClint) │ clint@clintonowen.com │ [https://github.com/clintonowen](https://github.com/clintonowen)
 
-Distributed under the XYZ license. See ``LICENSE`` for more information.
+Distributed under the GNU GPLv3 License. See ``LICENSE`` for more information.
 
 [https://github.com/yourname/github-link](https://github.com/dbader/) -->
-
-<!-- ## Contributing
-
-1. Fork it (<https://github.com/yourname/yourproject/fork>)
-2. Create your feature branch (`git checkout -b feature/fooBar`)
-3. Commit your changes (`git commit -am 'Add some fooBar'`)
-4. Push to the branch (`git push origin feature/fooBar`)
-5. Create a new Pull Request -->
 
 <!-- Markdown link & img dfn's -->
 [npm-image]: https://img.shields.io/npm/v/datadog-metrics.svg?style=flat-square
