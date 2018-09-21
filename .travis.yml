@@ -3,4 +3,11 @@ node_js: node
 services: mongodb
 cache:
   directories:
-    - node_modules
+  - node_modules
+deploy:
+  provider: heroku
+  api_key:
+    secure: yvJQ7DVcC8yo3MPjOBsCZ6heB7zNA3oJ09nzcezHI99NZYiFFLo5CADOTIyvIVQWhElO689VHYabn2Dw3cbHqnJKgZAr76R81bSGf8+NJ6YP/vk1h/LapTuQ19pl6qm5VWK/xE2cOVLu510w+1/9xn3w4V9DuYlJFYuTIOj2o8p7m9eg8fiBeeIczE1eH2dzu2lRH6YWEIqlxDBK79yCvN4f9yZGdPjoXAzvDjftnKLhk1kBxu6126L7xXdfLIoUiKf1IE29lG/vykPHqVJDNotdnUqMveMiwRqVpxHW01Z281fFQZtBFXAoSMyqbSz7QDiNF0JPbtAcn4+cM49spc3+9FSEvGz7rl4Sf9qWsKxFKiQqGw25BePYrTbdFrmEKQI+wPESnX0MEigYY5NUAA+u4RnRVusnQ01OCh2Lz+dGhcZLooqGy667KBS0gkfPchlmrQqLSk3Tqf8KLo7DfDhKZ0PUJC74FG+K92Ep+cd4kw3mdluAma/W6gY77zEkMAkn2NTnul/Mltg3hXDsZ2/Zf+zsjLksHl0f9fTH4S+Hfp1AD6oGgOzx+LgoS97bvnDSoE6byju+U8UI1ejsHAvcVcyPNgfsFJYwft4uGbn9Wwwt0Tfggi8a22ci25RbAZa4mKdcL6dfQkbhlqpw8yRgbyF68HSviLhFKKRIYY0=
+  app: kando-mvp-server
+  on:
+    repo: clintonowen/kando-mvp-server
