@@ -1,11 +1,19 @@
 'use strict';
 
 const express = require('express');
+const passport = require('passport');
+
+const jwtStrategy = require('../passport/jwt');
 
 const User = require('../models/user');
 const Column = require('../models/column');
+const Task = require('../models/task');
 
 const router = express.Router();
+
+passport.use(jwtStrategy);
+
+const jwtAuth = passport.authenticate('jwt', { session: false, failWithError: true });
 
 /* ========== POST/CREATE A USER ========== */
 router.post('/', (req, res, next) => {
@@ -79,12 +87,12 @@ router.post('/', (req, res, next) => {
   }
   
   // Username and password were validated as pre-trimmed
-  let { username, password, email } = req.body;
+  let { username, password, email, demo } = req.body;
   email = email.trim();
 
   const usernameRegExp = new RegExp(/^[a-zA-Z0-9_]+$/);
 
-  if (!usernameRegExp.test(username)) {
+  if (!demo && !usernameRegExp.test(username)) {
     const err = new Error('Sorry, only letters (a-z), numbers (0-9), and underscores ( _ ) are allowed');
     err.status = 422;
     err.reason = 'ValidationError';
@@ -112,12 +120,92 @@ router.post('/', (req, res, next) => {
       return User.create(newUser);
     })
     .then(user => {
-      const defaultColumns = [
+      let defaultColumns = [
         {name: 'To Do', userId: user.id},
         {name: 'Do Today', userId: user.id},
         {name: 'In Progress', userId: user.id},
         {name: 'Done', userId: user.id}
       ];
+      if (demo) {
+        Task.insertMany([
+          {
+            '_id': '999999999999999999999901',
+            'name': 'Scan receipts',
+            'time': 0,
+            'userId': user.id
+          },
+          {
+            '_id': '999999999999999999999902',
+            'name': 'Weekly meal planning',
+            'time': 0,
+            'userId': user.id
+          },
+          {
+            '_id': '999999999999999999999903',
+            'name': 'File tax return',
+            'time': 0,
+            'userId': user.id
+          },
+          {
+            '_id': '999999999999999999999904',
+            'name': 'Post garage sale advertisement',
+            'time': 0,
+            'userId': user.id
+          },
+          {
+            '_id': '999999999999999999999905',
+            'name': 'Prepare for interview',
+            'time': 0,
+            'userId': user.id
+          },
+          {
+            '_id': '999999999999999999999906',
+            'name': 'Schedule an oil change',
+            'time': 1380000,
+            'userId': user.id
+          },
+          {
+            '_id': '999999999999999999999907',
+            'name': 'Work on budget',
+            'time': 2300000,
+            'userId': user.id
+          }
+        ]
+        );
+        defaultColumns = [
+          {
+            name: 'To Do',
+            userId: user.id,
+            tasks: [
+              '999999999999999999999901',
+              '999999999999999999999902',
+              '999999999999999999999903'
+            ]
+          },
+          {
+            name: 'Do Today',
+            userId: user.id,
+            'tasks': [
+              '999999999999999999999904',
+              '999999999999999999999905'
+            ]
+          },
+          {
+            name: 'In Progress',
+            userId: user.id,
+            'tasks': [
+              '999999999999999999999906'
+            ]
+          },
+          {
+            name: 'Done',
+            userId: user.id,
+            'tasks': [
+              '999999999999999999999907'
+            ]
+          }
+        ];
+      }
       return Promise.all([
         Promise.resolve(user),
         Column.insertMany(defaultColumns)
@@ -134,6 +222,23 @@ router.post('/', (req, res, next) => {
         err.reason = 'ValidationError';
         err.location = 'username';
       }
+      next(err);
+    });
+});
+
+/* ========== DELETE A USER ========== */
+router.delete('/', jwtAuth, (req, res, next) => {
+  const userId = req.user.id;
+
+  Promise.all([
+    Column.deleteMany({ userId }),
+    Task.deleteMany({ userId }),
+    User.findByIdAndRemove(userId)
+  ])
+    .then(() => {
+      res.sendStatus(204);
+    })
+    .catch(err => {
       next(err);
     });
 });
